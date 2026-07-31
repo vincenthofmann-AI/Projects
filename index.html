@@ -13,19 +13,30 @@ import {
   ChevronRight, 
   ChevronLeft,
   CheckCircle2,
-  AlertTriangle,
-  HelpCircle,
   ExternalLink,
-  Sparkles,
-  Award,
   Sun,
   Waves,
-  Compass
+  Compass,
+  Coffee,
+  ShoppingBag,
+  Building,
+  Utensils,
+  Wifi,
+  Sparkles,
+  AlertCircle,
+  Check,
+  Layers
 } from 'lucide-react';
 
 export default function App() {
   // Genesis EV Model State
   const [selectedModel, setSelectedModel] = useState('gv60');
+
+  // Active Main Navigation Tab
+  const [activeTab, setActiveTab] = useState('charging_types'); // 'charging_types' | 'route_sim' | 'directory' | 'checklist'
+
+  // Selected Charging Type for Visual Deep Dive
+  const [selectedType, setSelectedType] = useState('ccs1');
 
   // Journey Wizard Step State (1 to 4)
   const [activeStep, setActiveStep] = useState(1);
@@ -66,6 +77,97 @@ export default function App() {
       nativePort: 'CCS1',
       adapterNeededForTesla: true,
       tripBatteryUsage: '~50% to 58% of battery (one-way)'
+    }
+  };
+
+  // Detailed Charging Types En Route Data with Illustrated Diagrams & Services
+  const chargingTypes = {
+    ccs1: {
+      id: 'ccs1',
+      badge: 'RECOMMENDED FOR GENESIS (800V)',
+      title: 'Level 3 Ultra-Fast DC (CCS1 Native Port)',
+      speed: '150 kW - 350 kW Ultra-Fast DC',
+      chargingTime: '10% to 80% in ~18 Mins (Peak ~235 kW)',
+      nativePort: 'Native Genesis Port (Direct Plug-In)',
+      adapterRequired: false,
+      adapterText: 'No Adapter Required!',
+      payment: 'Direct Credit Card Tap / Apple Pay OR Electrify Canada / Ivy App',
+      description: 'The native fast-charging standard for your Genesis EV. Combines standard J1772 AC pins with 2 heavy-duty high-voltage DC pins below. Fully unlocks your vehicle\'s 800-volt architecture for ultra-fast charging.',
+      enRouteLocations: [
+        'Electrify Canada Owen Sound (SmartCentres / Walmart Plaza)',
+        'Ivy Charging Network (Orangeville & Shelburne Plazas)',
+        'Petro-Canada & Electrify Canada Corridors (Burlington / QEW / Hwy 407)'
+      ],
+      amenities: [
+        { icon: ShoppingBag, name: 'Walmart, Canadian Tire & Retail Plazas' },
+        { icon: Utensils, name: 'Fast Casual Dining & Restaurants' },
+        { icon: Coffee, name: 'Tim Hortons & Starbucks On-site' },
+        { icon: Wifi, name: 'Clean Public Restrooms & Free Wi-Fi' }
+      ]
+    },
+    nacs: {
+      id: 'nacs',
+      badge: 'REQUIRES ADAPTER (Pre-2026 Models)',
+      title: 'Tesla V3 / V4 Supercharger (NACS Connector)',
+      speed: '250 kW Max (Delivers ~100 - 125 kW to Genesis)',
+      chargingTime: '10% to 80% in ~28 - 32 Mins',
+      nativePort: 'Tesla NACS Plug Style',
+      adapterRequired: true,
+      adapterText: 'Official Genesis NACS-to-CCS1 Adapter Required',
+      payment: 'Tesla Mobile App ONLY (Select stall & tap Start Charging)',
+      description: 'Tesla V3/V4 Superchargers operate on a 400V system. When plugged into a Genesis 800V vehicle using the official Genesis adapter, the vehicle\'s rear motor/inverter acts as a 400V->800V step-up boost converter, capping top speed at ~125 kW.',
+      enRouteLocations: [
+        'Tesla Supercharger Owen Sound (SmartCentres Plaza - 8 Stalls)',
+        'Tesla Supercharger Orangeville (Hwy 10 Corridor)'
+      ],
+      amenities: [
+        { icon: ShoppingBag, name: 'SmartCentres Owen Sound Shopping Hub' },
+        { icon: Coffee, name: 'Coffee & Takeout Options Nearby' },
+        { icon: Building, name: '24/7 Restroom Access in Plazas' }
+      ]
+    },
+    j1772: {
+      id: 'j1772',
+      badge: 'DESTINATION CHARGING',
+      title: 'Level 2 AC Charger (J1772 Connector)',
+      speed: '6.6 kW - 11 kW AC',
+      chargingTime: 'Adds ~35 - 45 km range per hour (~5 to 7 hrs full charge)',
+      nativePort: 'Upper Section of Genesis Port (Direct Plug-In)',
+      adapterRequired: false,
+      adapterText: 'No Adapter Required!',
+      payment: 'FLO App, ChargePoint App, or Municipal Meter Payment',
+      description: 'Standard AC destination charging connector. Plugs into the top circular portion of your Genesis charging socket. Perfect for leaving your vehicle plugged in while spending hours at the beach, shopping, or eating.',
+      enRouteLocations: [
+        'Sauble Beach Municipal Beach Parking Lots (FLO Network)',
+        'Downtown Burlington GO & Plaza Public Level 2 Stations',
+        'Hotels & Inns in Owen Sound, Shelburne & Wiarton'
+      ],
+      amenities: [
+        { icon: Waves, name: 'Direct Sauble Beach Waterfront & Boardwalk' },
+        { icon: Utensils, name: 'Sauble Beach Main St Patio Dining & Ice Cream' },
+        { icon: Sun, name: 'All-Day Beach Parking Convenience' }
+      ]
+    },
+    level1: {
+      id: 'level1',
+      badge: 'COTTAGE TRICKLE CHARGING',
+      title: 'Level 1 Portable Trickle Charger (120V Outlet)',
+      speed: '1.2 kW - 1.4 kW (Standard 15A Household Wall Outlet)',
+      chargingTime: 'Adds ~5 - 7 km range per hour (~65-70 km overnight)',
+      nativePort: 'Genesis Included Portable Cable (NEMA 5-15 Plug)',
+      adapterRequired: false,
+      adapterText: 'Includes Portable Cable in Trunk',
+      payment: 'Free / Included with Cottage Stay',
+      description: 'Your Genesis includes a 120V portable charging cable in the lower trunk floor. You can plug it into any standard 3-prong household outdoor outlet at your cottage or rental property on 21 Fifth Avenue South.',
+      enRouteLocations: [
+        '21 Fifth Avenue South Cottage Driveways & Garages (Sauble Beach)',
+        'Overnight Airbnb / Rental Cabin Plugs along Bruce Peninsula'
+      ],
+      amenities: [
+        { icon: Waves, name: 'Private Cottage / Rental Comfort' },
+        { icon: Coffee, name: 'Relaxing Overnight Charging while Sleeping' },
+        { icon: Sparkles, name: 'Zero Public Station Wait Times' }
+      ]
     }
   };
 
@@ -182,6 +284,7 @@ export default function App() {
   };
 
   const currentModel = models[selectedModel];
+  const activeTypeData = chargingTypes[selectedType];
   const activeCorridor = corridors[selectedCorridor];
 
   const toggleChecklist = (key) => {
@@ -244,7 +347,7 @@ export default function App() {
               Burlington to Sauble Beach Road Trip Masterclass
             </h2>
             <p className="text-sm text-slate-300 leading-relaxed">
-              Your <strong className="text-amber-400">{currentModel.name}</strong> has a full-charge range of <strong>{currentModel.range}</strong>. Since the trip is 225 km, you can comfortably make it on a single charge in good weather. However, taking a quick **10 to 15 minute coffee stop in Orangeville or Owen Sound** guarantees you arrive at the beach with plenty of energy to explore!
+              Your <strong className="text-amber-400">{currentModel.name}</strong> has a full-charge range of <strong>{currentModel.range}</strong>. Explore charging types, visual plug diagrams, adapters, and amenities along the route below.
             </p>
           </div>
 
@@ -269,297 +372,721 @@ export default function App() {
           </div>
         </section>
 
-        {/* INTERACTIVE 4-STEP DRIVE SIMULATOR */}
-        <section className="bg-slate-900/80 rounded-3xl border border-slate-800 p-6 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-            <div>
-              <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">Step-By-Step Walkthrough</span>
-              <h3 className="text-lg font-bold text-white">How Your Drive Will Work (Step-by-Step)</h3>
+        {/* PAGE NAVIGATION TABS */}
+        <nav className="flex overflow-x-auto gap-2 border-b border-slate-800 pb-2 scrollbar-none">
+          {[
+            { id: 'charging_types', label: '1. Visual Charging & Adapter Guide', icon: Plug },
+            { id: 'route_sim', label: '2. Step-by-Step Trip Walkthrough', icon: Navigation },
+            { id: 'directory', label: '3. En-Route Station Directory', icon: MapPin },
+            { id: 'checklist', label: '4. Pre-Trip Checklist', icon: ShieldCheck }
+          ].map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
+                    : 'bg-slate-900/80 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* TAB 1: DEDICATED VISUAL CHARGING TYPES & ADAPTERS GUIDE PAGE */}
+        {activeTab === 'charging_types' && (
+          <div className="space-y-6">
+            
+            <div className="bg-slate-900/80 rounded-3xl border border-slate-800 p-6 space-y-4">
+              <div>
+                <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">En-Route Charger Hardware Guide</span>
+                <h3 className="text-xl font-bold text-white mt-0.5">Every Charging Type En Route: Plugs, Adapters & Services</h3>
+                <p className="text-xs text-slate-400">
+                  Select a charger type below to inspect its visual hardware diagram, adapter requirement for your {currentModel.name}, payment methods, and nearby amenities between Burlington and Sauble Beach.
+                </p>
+              </div>
+
+              {/* Charging Type Selection Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                  { id: 'ccs1', label: 'Ultra-Fast CCS1 DC', badge: 'Native (350kW)', color: 'border-amber-500' },
+                  { id: 'nacs', label: 'Tesla Supercharger', badge: 'Adapter Needed', color: 'border-blue-500' },
+                  { id: 'j1772', label: 'Level 2 AC J1772', badge: 'Beach / Public', color: 'border-emerald-500' },
+                  { id: 'level1', label: 'Level 1 120V Outlet', badge: 'Cottage Trickle', color: 'border-purple-500' }
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setSelectedType(item.id)}
+                    className={`p-4 rounded-2xl border text-left transition-all flex flex-col justify-between gap-2 ${
+                      selectedType === item.id
+                        ? 'bg-amber-500/10 border-amber-500 shadow-md ring-1 ring-amber-500/50'
+                        : 'bg-slate-950 border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">{item.badge}</span>
+                      <h4 className="text-xs font-bold text-white">{item.label}</h4>
+                    </div>
+                    <span className={`text-[11px] font-semibold flex items-center gap-1 ${selectedType === item.id ? 'text-amber-400' : 'text-slate-500'}`}>
+                      View Details <ChevronRight className="w-3 h-3" />
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Step Controls */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-2 sm:pb-0 scrollbar-none">
-              {[1, 2, 3, 4].map((stepNum) => (
+            {/* DEDICATED VISUAL HARDWARE & SERVICES CARD */}
+            <div className="bg-slate-900/90 rounded-3xl border border-slate-800 p-6 md:p-8 space-y-8">
+              
+              {/* Card Header & Badge */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-5">
+                <div>
+                  <span className={`text-xs font-bold px-3 py-1 rounded-full border inline-block mb-2 ${
+                    activeTypeData.adapterRequired 
+                      ? 'bg-blue-500/10 text-blue-400 border-blue-500/30'
+                      : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                  }`}>
+                    {activeTypeData.badge}
+                  </span>
+                  <h3 className="text-xl md:text-2xl font-extrabold text-white">{activeTypeData.title}</h3>
+                  <p className="text-xs text-slate-400 mt-1">{activeTypeData.description}</p>
+                </div>
+
+                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex-shrink-0 space-y-1">
+                  <span className="text-[11px] text-slate-400 block font-semibold">Speed & Capability:</span>
+                  <span className="text-sm font-bold text-amber-400 block">{activeTypeData.speed}</span>
+                  <span className="text-[11px] text-emerald-400 block font-medium">{activeTypeData.chargingTime}</span>
+                </div>
+              </div>
+
+              {/* ILLUSTRATED HARDWARE DIAGRAM SECTION */}
+              <div className="grid md:grid-cols-12 gap-6 bg-slate-950 p-6 rounded-2xl border border-slate-800">
+                
+                {/* SVG Illustration Container */}
+                <div className="md:col-span-5 flex flex-col items-center justify-center p-6 bg-slate-900/80 rounded-xl border border-slate-800 text-center space-y-3">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Connector Diagram</span>
+                  
+                  {/* SVG ILLUSTRATIONS FOR CHARGER TYPES */}
+                  {selectedType === 'ccs1' && (
+                    <svg viewBox="0 0 200 200" className="w-40 h-40">
+                      {/* Outer Handle Shell */}
+                      <rect x="30" y="20" width="140" height="160" rx="30" fill="#1e293b" stroke="#334155" strokeWidth="4" />
+                      {/* Upper AC J1772 Section */}
+                      <circle cx="100" cy="70" r="38" fill="#0f172a" stroke="#f59e0b" strokeWidth="3" />
+                      {/* AC Pins */}
+                      <circle cx="100" cy="48" r="6" fill="#f59e0b" />
+                      <circle cx="82" cy="62" r="7" fill="#cbd5e1" />
+                      <circle cx="118" cy="62" r="7" fill="#cbd5e1" />
+                      <circle cx="86" cy="88" r="6" fill="#cbd5e1" />
+                      <circle cx="114" cy="88" r="6" fill="#cbd5e1" />
+                      {/* Lower High-Voltage DC Section */}
+                      <rect x="60" y="118" width="80" height="48" rx="20" fill="#0f172a" stroke="#f59e0b" strokeWidth="3" />
+                      <circle cx="80" cy="142" r="14" fill="#38bdf8" />
+                      <circle cx="120" cy="142" r="14" fill="#38bdf8" />
+                    </svg>
+                  )}
+
+                  {selectedType === 'nacs' && (
+                    <div className="space-y-2">
+                      <svg viewBox="0 0 200 160" className="w-40 h-32">
+                        {/* Tesla Cable Handle */}
+                        <path d="M 40 40 C 40 20, 160 20, 160 40 L 150 100 L 50 100 Z" fill="#1e293b" stroke="#38bdf8" strokeWidth="3" />
+                        <rect x="65" y="45" width="70" height="40" rx="10" fill="#0f172a" stroke="#38bdf8" strokeWidth="2" />
+                        <circle cx="85" cy="65" r="7" fill="#38bdf8" />
+                        <circle cx="115" cy="65" r="7" fill="#38bdf8" />
+                        {/* Adapter Coupler Graphic */}
+                        <rect x="40" y="105" width="120" height="40" rx="8" fill="#334155" stroke="#f59e0b" strokeWidth="2" />
+                        <text x="100" y="130" textAnchor="middle" fill="#f59e0b" fontSize="10" fontWeight="bold">NACS ➔ CCS1 ADAPTER</text>
+                      </svg>
+                    </div>
+                  )}
+
+                  {selectedType === 'j1772' && (
+                    <svg viewBox="0 0 200 180" className="w-40 h-36">
+                      <circle cx="100" cy="90" r="65" fill="#1e293b" stroke="#10b981" strokeWidth="4" />
+                      <circle cx="100" cy="90" r="50" fill="#0f172a" />
+                      {/* Pins */}
+                      <circle cx="100" cy="58" r="8" fill="#10b981" />
+                      <circle cx="75" cy="80" r="9" fill="#cbd5e1" />
+                      <circle cx="125" cy="80" r="9" fill="#cbd5e1" />
+                      <circle cx="80" cy="115" r="7" fill="#cbd5e1" />
+                      <circle cx="120" cy="115" r="7" fill="#cbd5e1" />
+                    </svg>
+                  )}
+
+                  {selectedType === 'level1' && (
+                    <svg viewBox="0 0 200 160" className="w-40 h-32">
+                      <rect x="50" y="20" width="100" height="120" rx="20" fill="#1e293b" stroke="#a855f7" strokeWidth="4" />
+                      <rect x="70" y="40" width="12" height="30" rx="4" fill="#cbd5e1" />
+                      <rect x="118" y="40" width="12" height="30" rx="4" fill="#cbd5e1" />
+                      <circle cx="100" cy="100" r="10" fill="#cbd5e1" />
+                    </svg>
+                  )}
+
+                  <span className="text-[11px] text-amber-400 font-bold block">
+                    {activeTypeData.nativePort}
+                  </span>
+                </div>
+
+                {/* Compatibility & Adapter Details */}
+                <div className="md:col-span-7 flex flex-col justify-between space-y-4">
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">Adapter & Compatibility Profile</h4>
+                    
+                    <div className="bg-slate-900 p-3.5 rounded-xl border border-slate-800 space-y-2 text-xs">
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-400">Genesis Port Native Plug:</span>
+                        <span className="text-white font-bold">{currentModel.nativePort}</span>
+                      </div>
+                      <div className="flex justify-between items-center border-t border-slate-800 pt-2">
+                        <span className="text-slate-400">Adapter Required?</span>
+                        <span className={`font-bold flex items-center gap-1 ${
+                          activeTypeData.adapterRequired ? 'text-blue-400' : 'text-emerald-400'
+                        }`}>
+                          {activeTypeData.adapterRequired ? (
+                            <><AlertCircle className="w-3.5 h-3.5" /> YES (Genesis NACS Adapter)</>
+                          ) : (
+                            <><Check className="w-3.5 h-3.5" /> NO (Direct Plug-In)</>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-900 p-3.5 rounded-xl border border-slate-800 space-y-1 text-xs">
+                      <span className="text-slate-400 font-semibold block">Payment & Activation Method:</span>
+                      <span className="text-amber-300 font-medium block">{activeTypeData.payment}</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-amber-500/10 p-3.5 rounded-xl border border-amber-500/30 text-xs text-amber-200">
+                    <strong>Genesis Driver Tip:</strong> {activeTypeData.adapterText}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* SERVICES & AMENITIES AVAILABLE EN ROUTE */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                  <Coffee className="w-4 h-4 text-amber-400" />
+                  Services & Amenities Available at {activeTypeData.title} Stops
+                </h4>
+
+                {/* Amenity Icons Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {activeTypeData.amenities.map((item, idx) => {
+                    const IconComp = item.icon;
+                    return (
+                      <div key={idx} className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center gap-3 text-xs">
+                        <div className="p-2 bg-slate-900 rounded-lg text-amber-400 border border-slate-800">
+                          <IconComp className="w-4 h-4" />
+                        </div>
+                        <span className="text-slate-300 font-medium leading-tight">{item.name}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* En Route Locations List */}
+                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
+                  <span className="text-amber-400 font-bold block">Key Locations along Burlington ➔ Sauble Beach Route:</span>
+                  <ul className="list-disc pl-4 space-y-1 text-slate-300">
+                    {activeTypeData.enRouteLocations.map((loc, idx) => (
+                      <li key={idx}>{loc}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        )}
+
+        {/* TAB 2: STEP-BY-STEP TRIP WALKTHROUGH */}
+        {activeTab === 'route_sim' && (
+          <section className="bg-slate-900/80 rounded-3xl border border-slate-800 p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+              <div>
+                <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">Step-By-Step Walkthrough</span>
+                <h3 className="text-lg font-bold text-white">Every En-Route Charging Option: Speeds, Compatibility & Payment</h3>
+              </div>
+
+              {/* Step Controls */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-2 sm:pb-0 scrollbar-none">
+                {[1, 2, 3, 4].map((stepNum) => (
+                  <button
+                    key={stepNum}
+                    onClick={() => setActiveStep(stepNum)}
+                    className={`w-9 h-9 rounded-xl font-bold text-xs flex items-center justify-center transition-all ${
+                      activeStep === stepNum
+                        ? 'bg-amber-500 text-slate-950 shadow-md scale-105'
+                        : activeStep > stepNum
+                        ? 'bg-slate-800 text-emerald-400 border border-emerald-500/30'
+                        : 'bg-slate-950 text-slate-500 border border-slate-800'
+                    }`}
+                  >
+                    {activeStep > stepNum ? <CheckCircle2 className="w-5 h-5" /> : `Phase ${stepNum}`}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* PHASE 1: BURLINGTON DEPARTURE */}
+            {activeStep === 1 && (
+              <div className="space-y-4 animate-fadeIn">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-400 border border-amber-500/20">
+                    <Car className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-base font-bold text-white">Phase 1: Departing Burlington (5056 New St Area)</h4>
+                    <p className="text-xs text-slate-400">All available pre-departure charging options in Halton</p>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-3 text-xs">
+                  {/* Petro-Can Burlington */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h5 className="font-bold text-white">Petro-Canada EV (QEW / Fairview St)</h5>
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/30">
+                        💳 Credit Card Direct
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 200 kW - 350 kW Ultra-Fast DC (10-80% in ~18 min)</p>
+                    <p className="text-amber-400"><strong>Compatibility:</strong> Native Genesis CCS1 Port (No adapter needed)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> Tap Visa/Mastercard/Apple Pay directly at screen. No app required.</p>
+                  </div>
+
+                  {/* Electrify Canada Burlington */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h5 className="font-bold text-white">Electrify Canada (Appleby / QEW Plazas)</h5>
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/30">
+                        💳 Credit Card Direct
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 150 kW - 350 kW Ultra-Fast DC (10-80% in ~18 min)</p>
+                    <p className="text-amber-400"><strong>Compatibility:</strong> Native Genesis CCS1 Port (No adapter needed)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> Credit card terminal on screen or Electrify Canada App.</p>
+                  </div>
+
+                  {/* FLO / ChargePoint Burlington */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h5 className="font-bold text-white">FLO & ChargePoint (Burlington GO / Plazas)</h5>
+                      <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold border border-amber-500/30">
+                        📱 Mobile App Required
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 50 kW DC Fast & 7-11 kW Level 2 AC</p>
+                    <p className="text-amber-400"><strong>Compatibility:</strong> Native CCS1 / J1772 Port (No adapter needed)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> Requires FLO or ChargePoint Mobile App with loaded account balance.</p>
+                  </div>
+
+                  {/* Tesla Burlington */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h5 className="font-bold text-white">Tesla Supercharger Burlington</h5>
+                      <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold border border-amber-500/30">
+                        📱 Mobile App Required
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 250 kW DC (Delivers ~100-125 kW to Genesis, 10-80% in ~30 min)</p>
+                    <p className="text-blue-400"><strong>Compatibility:</strong> NACS Plug (Requires Genesis NACS-to-CCS Adapter)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> Tesla Mobile App ONLY (Select stall number & tap Start Charging).</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* PHASE 2: EN-ROUTE HIGHWAY CORRIDORS */}
+            {activeStep === 2 && (
+              <div className="space-y-4 animate-fadeIn">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-400 border border-emerald-500/20">
+                    <Zap className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-base font-bold text-white">Phase 2: En-Route Options (Hwy 10 & Hwy 6 Corridors)</h4>
+                    <p className="text-xs text-slate-400">Orangeville, Shelburne, Flesherton, Markdale, Durham & Chatsworth</p>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-3 text-xs">
+                  {/* Electrify Canada Orangeville */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-amber-500/30 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h5 className="font-bold text-white">Electrify Canada Orangeville (SmartCentres Hwy 10)</h5>
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/30">
+                        💳 Credit Card Direct
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 150 kW - 350 kW Ultra-Fast DC (~18 mins for Genesis 800V)</p>
+                    <p className="text-amber-400"><strong>Compatibility:</strong> Native Genesis CCS1 Port (No adapter needed)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> Direct Credit Card Tap on machine or Electrify Canada App.</p>
+                  </div>
+
+                  {/* Ivy Orangeville & Shelburne */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h5 className="font-bold text-white">Ivy Charging Network (Orangeville & Shelburne Plazas)</h5>
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/30">
+                        💳 Card OR 📱 App
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 50 kW - 150 kW DC Fast (~25-30 mins)</p>
+                    <p className="text-amber-400"><strong>Compatibility:</strong> Native Genesis CCS1 Port (No adapter needed)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> On-screen Credit Card reader OR Ivy Charging Mobile App.</p>
+                  </div>
+
+                  {/* Petro-Can Hwy 10 */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h5 className="font-bold text-white">Petro-Canada EV Orangeville / Hwy 10</h5>
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/30">
+                        💳 Credit Card Direct
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 200 kW DC Fast (~20 mins)</p>
+                    <p className="text-amber-400"><strong>Compatibility:</strong> Native Genesis CCS1 Port (No adapter needed)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> Direct Credit Card Tap / Chip at machine (No app required).</p>
+                  </div>
+
+                  {/* FLO Small Town Corridor */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h5 className="font-bold text-white">FLO Network (Shelburne, Flesherton, Markdale, Durham)</h5>
+                      <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold border border-amber-500/30">
+                        📱 Mobile App Required
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 50 kW DC Fast (~40 mins)</p>
+                    <p className="text-amber-400"><strong>Compatibility:</strong> Native Genesis CCS1 Port (No adapter needed)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> FLO Mobile App OR FLO RFID Card. Pre-load app balance before trip.</p>
+                  </div>
+
+                  {/* Tesla Supercharger Orangeville */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 md:col-span-2">
+                    <div className="flex justify-between items-start">
+                      <h5 className="font-bold text-white">Tesla Supercharger Orangeville (Hwy 10 Corridor)</h5>
+                      <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold border border-amber-500/30">
+                        📱 Mobile App Required
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 250 kW DC (Delivers ~100 kW to Genesis due to 400V boost converter)</p>
+                    <p className="text-blue-400"><strong>Compatibility:</strong> NACS Plug (Requires Genesis NACS-to-CCS Adapter)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> Tesla Mobile App ONLY. Select stall & tap Start Charging in app.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* PHASE 3: OWEN SOUND GATEWAY */}
+            {activeStep === 3 && (
+              <div className="space-y-4 animate-fadeIn">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-400 border border-blue-500/20">
+                    <Navigation className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-base font-bold text-white">Phase 3: Owen Sound Gateway Hub Options (~30 min to Sauble Beach)</h4>
+                    <p className="text-xs text-slate-400">All fast charging choices at the Hwy 6 / Hwy 10 junction</p>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-3 text-xs">
+                  {/* Electrify Canada Owen Sound */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-amber-500/40 space-y-2 md:col-span-2">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="text-[10px] bg-amber-500 text-slate-950 px-2 py-0.5 rounded font-bold uppercase mr-2">⭐ TOP RECOMMENDATION</span>
+                        <h5 className="font-bold text-white text-sm inline-block">Electrify Canada Owen Sound (SmartCentres Walmart)</h5>
+                      </div>
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/30">
+                        💳 Credit Card Direct
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 150 kW - 350 kW Ultra-Fast DC (10% to 80% in ~18 min peak ~235 kW)</p>
+                    <p className="text-amber-400"><strong>Compatibility:</strong> Native Genesis CCS1 Port (No adapter needed)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> Tap Visa/Mastercard/Apple Pay directly on terminal screen or via Electrify Canada App.</p>
+                  </div>
+
+                  {/* Petro-Canada Owen Sound */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h5 className="font-bold text-white">Petro-Canada EV Owen Sound</h5>
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/30">
+                        💳 Credit Card Direct
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 200 kW - 350 kW Ultra-Fast DC (~18-20 mins)</p>
+                    <p className="text-amber-400"><strong>Compatibility:</strong> Native Genesis CCS1 Port (No adapter needed)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> Direct Credit Card Tap / Chip reader on dispenser terminal.</p>
+                  </div>
+
+                  {/* Ivy Owen Sound */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h5 className="font-bold text-white">Ivy Charging Network Owen Sound</h5>
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/30">
+                        💳 Card OR 📱 App
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 50 kW - 150 kW DC Fast (~25-30 mins)</p>
+                    <p className="text-amber-400"><strong>Compatibility:</strong> Native Genesis CCS1 Port (No adapter needed)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> Credit card terminal on machine or Ivy Mobile App.</p>
+                  </div>
+
+                  {/* Tesla Owen Sound */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h5 className="font-bold text-white">Tesla Supercharger Owen Sound (8 Stalls)</h5>
+                      <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold border border-amber-500/30">
+                        📱 Mobile App Required
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 250 kW DC (Delivers ~100-125 kW to Genesis)</p>
+                    <p className="text-blue-400"><strong>Compatibility:</strong> NACS Plug (Requires Genesis NACS Adapter)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> Tesla Mobile App ONLY.</p>
+                  </div>
+
+                  {/* FLO Owen Sound */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h5 className="font-bold text-white">FLO Owen Sound (Heritage Park & Municipal)</h5>
+                      <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold border border-amber-500/30">
+                        📱 Mobile App Required
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 50 kW DC & Level 2 AC</p>
+                    <p className="text-amber-400"><strong>Compatibility:</strong> Native CCS1 / J1772 Port (No adapter needed)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> FLO Mobile App or FLO RFID Card.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* PHASE 4: SAUBLE BEACH ARRIVAL */}
+            {activeStep === 4 && (
+              <div className="space-y-4 animate-fadeIn">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-cyan-500/10 rounded-2xl text-cyan-400 border border-cyan-500/20">
+                    <Waves className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-base font-bold text-white">Phase 4: Arriving at Sauble Beach (21 Fifth Ave S Area)</h4>
+                    <p className="text-xs text-slate-400">Beach destination charging & cottage driveway options</p>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-3 text-xs">
+                  {/* FLO Sauble Beach */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h5 className="font-bold text-white">FLO Sauble Beach Municipal Lots</h5>
+                      <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold border border-amber-500/30">
+                        📱 Mobile App Required
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 6.6 kW - 9.6 kW Level 2 AC (Adds ~35-45 km range/hr)</p>
+                    <p className="text-amber-400"><strong>Compatibility:</strong> Native Genesis J1772 Port (No adapter needed)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> FLO Mobile App. Leaves vehicle charging all day while on the beach!</p>
+                  </div>
+
+                  {/* Level 1 Cottage Trickle */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h5 className="font-bold text-white">21 Fifth Avenue S Cottage Outlet</h5>
+                      <span className="px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 font-bold border border-purple-500/30">
+                        🆓 Free / Included
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 1.2 kW - 1.4 kW Level 1 AC (Adds ~65-70 km overnight)</p>
+                    <p className="text-amber-400"><strong>Compatibility:</strong> Genesis Portable Cable in Trunk (Standard 120V 3-Prong Plug)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> Free! Plug into outdoor household wall outlet at cottage.</p>
+                  </div>
+
+                  {/* Wiarton Fast Chargers */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h5 className="font-bold text-white">Wiarton Fast Chargers (15 mins East)</h5>
+                      <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold border border-amber-500/30">
+                        📱 Mobile App Required
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 50 kW DC Fast (~40 mins full top up)</p>
+                    <p className="text-amber-400"><strong>Compatibility:</strong> Native Genesis CCS1 Port (No adapter needed)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> FLO / Ivy Mobile App.</p>
+                  </div>
+
+                  {/* Southampton / Port Elgin */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h5 className="font-bold text-white">Southampton & Port Elgin (20 mins South)</h5>
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/30">
+                        💳 Card OR 📱 App
+                      </span>
+                    </div>
+                    <p className="text-slate-300"><strong>Speed:</strong> 50 kW - 200 kW DC Fast Chargers</p>
+                    <p className="text-amber-400"><strong>Compatibility:</strong> Native Genesis CCS1 Port (No adapter needed)</p>
+                    <p className="text-slate-400"><strong>Payment:</strong> Direct Credit Card Tap at Petro-Canada or Ivy/FLO Mobile Apps.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Navigation Controls */}
+            <div className="flex justify-between items-center pt-4 border-t border-slate-800">
+              <button
+                disabled={activeStep === 1}
+                onClick={() => setActiveStep(prev => prev - 1)}
+                className={`flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                  activeStep === 1
+                    ? 'opacity-40 text-slate-600 cursor-not-allowed'
+                    : 'bg-slate-800 text-slate-200 hover:bg-slate-700'
+                }`}
+              >
+                <ChevronLeft className="w-4 h-4" /> Previous Phase
+              </button>
+
+              <span className="text-xs text-slate-500">Phase {activeStep} of 4</span>
+
+              <button
+                disabled={activeStep === 4}
+                onClick={() => setActiveStep(prev => prev + 1)}
+                className={`flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                  activeStep === 4
+                    ? 'opacity-40 text-slate-600 cursor-not-allowed'
+                    : 'bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md'
+                }`}
+              >
+                Next Phase <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+          </section>
+        )}
+
+        {/* TAB 3: ROUTE DIRECTORY */}
+        {activeTab === 'directory' && (
+          <section className="bg-slate-900/80 rounded-3xl border border-slate-800 p-6 space-y-6">
+            <div>
+              <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">Complete Directory</span>
+              <h3 className="text-xl font-bold text-white mt-0.5">All Charging Options: Burlington ➔ Sauble Beach</h3>
+              <p className="text-xs text-slate-400">Select a section of the route below to inspect every charger, plug, and payment method.</p>
+            </div>
+
+            {/* Corridor Selection Pills */}
+            <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-none">
+              {[
+                { id: 'burlington', name: '1. Burlington (Start)' },
+                { id: 'enroute', name: '2. Orangeville / Shelburne' },
+                { id: 'owensound', name: '3. Owen Sound (Gateway)' },
+                { id: 'sauble', name: '4. Sauble Beach (Destination)' }
+              ].map((c) => (
                 <button
-                  key={stepNum}
-                  onClick={() => setActiveStep(stepNum)}
-                  className={`w-9 h-9 rounded-xl font-bold text-xs flex items-center justify-center transition-all ${
-                    activeStep === stepNum
-                      ? 'bg-amber-500 text-slate-950 shadow-md scale-105'
-                      : activeStep > stepNum
-                      ? 'bg-slate-800 text-emerald-400 border border-emerald-500/30'
-                      : 'bg-slate-950 text-slate-500 border border-slate-800'
+                  key={c.id}
+                  onClick={() => setSelectedCorridor(c.id)}
+                  className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                    selectedCorridor === c.id
+                      ? 'bg-amber-500 text-slate-950 shadow-md'
+                      : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
                   }`}
                 >
-                  {activeStep > stepNum ? <CheckCircle2 className="w-5 h-5" /> : `Phase ${stepNum}`}
+                  {c.name}
                 </button>
               ))}
             </div>
-          </div>
 
-          {/* PHASE 1: BURLINGTON DEPARTURE */}
-          {activeStep === 1 && (
-            <div className="space-y-4 animate-fadeIn">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-400 border border-amber-500/20">
-                  <Car className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="text-base font-bold text-white">Phase 1: Departing 5056 New St, Burlington</h4>
-                  <p className="text-xs text-slate-400">Pre-trip preparation in Halton Region</p>
-                </div>
+            {/* Corridor Details Card */}
+            <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-4">
+              <div className="border-b border-slate-800 pb-3">
+                <h4 className="text-lg font-bold text-white">{activeCorridor.title}</h4>
+                <p className="text-xs text-amber-400">{activeCorridor.locationDesc}</p>
+                <p className="text-xs text-slate-400 mt-1">{activeCorridor.recommendedStrategy}</p>
               </div>
 
-              <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3 text-xs text-slate-300">
-                <p>
-                  <strong>1. Start at 100% Charge:</strong> Charge overnight at home or top up at a local Burlington Level 2/Level 3 charger (e.g. Appleby Line plazas or Burlington Centre).
-                </p>
-                <p>
-                  <strong>2. Set Genesis Navigation:</strong> Program "21 Fifth Avenue South, Sauble Beach" into your factory navigation screen. If you choose to stop at Electrify Canada in Owen Sound, set that charger as your destination so your Genesis automatically pre-conditions (pre-warms) the battery for ultra-fast charging.
-                </p>
-                <p>
-                  <strong>3. Route Departure:</strong> Head north via Highway 407 / Highway 410 or Highway 25 towards Orangeville (Hwy 10).
-                </p>
-              </div>
-            </div>
-          )}
+              <div className="space-y-4">
+                {activeCorridor.stations.map((st, idx) => (
+                  <div key={idx} className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                      <h5 className="font-bold text-white text-sm">{st.provider}</h5>
+                      <span className="text-xs bg-slate-950 text-amber-400 px-2.5 py-1 rounded-lg border border-slate-800 w-fit">
+                        {st.type}
+                      </span>
+                    </div>
 
-          {/* PHASE 2: EN-ROUTE CHARGING OPTIONS */}
-          {activeStep === 2 && (
-            <div className="space-y-4 animate-fadeIn">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-400 border border-emerald-500/20">
-                  <Zap className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="text-base font-bold text-white">Phase 2: Highway 10 & Highway 6 Corridors</h4>
-                  <p className="text-xs text-slate-400">Orangeville, Shelburne & Durham</p>
-                </div>
-              </div>
+                    <div className="grid md:grid-cols-3 gap-2 text-xs pt-1">
+                      <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                        <span className="text-slate-500 block font-semibold">Plug Type</span>
+                        <span className="text-slate-200 font-medium">{st.plug}</span>
+                      </div>
+                      <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                        <span className="text-slate-500 block font-semibold">Payment Method</span>
+                        <span className="text-emerald-400 font-medium">{st.payment}</span>
+                      </div>
+                      <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                        <span className="text-slate-500 block font-semibold">Best Used For</span>
+                        <span className="text-amber-300 font-medium">{st.idealFor}</span>
+                      </div>
+                    </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
-                
-                <div className="bg-slate-950 p-4 rounded-2xl border border-amber-500/30 space-y-2">
-                  <span className="text-xs font-bold text-amber-400 uppercase tracking-wider block">Option A: Orangeville Stop (~75 km into trip)</span>
-                  <h5 className="font-bold text-white text-sm">Electrify Canada or Ivy Orangeville</h5>
-                  <p className="text-xs text-slate-300">
-                    Pull into the plaza along Hwy 10. Plug the native CCS1 connector straight into your Genesis. Tap your credit card on the screen. Grab a coffee, and in 10 minutes you'll add 150+ km of range!
-                  </p>
-                </div>
-
-                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Option B: Shelburne / Durham Stop (~120 km into trip)</span>
-                  <h5 className="font-bold text-white text-sm">Ivy / FLO Chargers</h5>
-                  <p className="text-xs text-slate-300">
-                    Great mid-way resting point. Uses FLO or Ivy mobile app. Reliable 50 kW to 150 kW DC charging stations.
-                  </p>
-                </div>
-
-              </div>
-            </div>
-          )}
-
-          {/* PHASE 3: OWEN SOUND GATEWAY */}
-          {activeStep === 3 && (
-            <div className="space-y-4 animate-fadeIn">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-400 border border-blue-500/20">
-                  <Navigation className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="text-base font-bold text-white">Phase 3: The Owen Sound Gateway Stop (~190 km from Burlington)</h4>
-                  <p className="text-xs text-slate-400">Just 30 minutes south of Sauble Beach</p>
-                </div>
-              </div>
-
-              <div className="bg-slate-950 p-5 rounded-2xl border border-amber-500/30 space-y-3 text-xs text-slate-300">
-                <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-                  <span className="font-bold text-white text-sm">⭐ Recommended Top-Up Point: Electrify Canada Owen Sound</span>
-                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">350 kW Ultra-Fast</span>
-                </div>
-                <p>
-                  Located at SmartCentres Owen Sound (Walmart plaza). This is the best place to charge before hitting Sauble Beach:
-                </p>
-                <ol className="list-decimal pl-4 space-y-1.5 text-slate-300">
-                  <li>Park at the 350 kW charger stall.</li>
-                  <li>Grab the heavy CCS cable and plug directly into your Genesis port (no adapter needed).</li>
-                  <li>Tap your credit card or Apple Pay on the screen reader.</li>
-                  <li>In <strong>12 to 15 minutes</strong>, your battery will jump back up to 80%–90%, giving you enough power for the rest of your weekend at Sauble Beach and the drive home!</li>
-                </ol>
-              </div>
-            </div>
-          )}
-
-          {/* PHASE 4: SAUBLE BEACH ARRIVAL */}
-          {activeStep === 4 && (
-            <div className="space-y-4 animate-fadeIn">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-cyan-500/10 rounded-2xl text-cyan-400 border border-cyan-500/20">
-                  <Waves className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="text-base font-bold text-white">Phase 4: Arriving at 21 Fifth Avenue South, Sauble Beach</h4>
-                  <p className="text-xs text-slate-400">Beach destination charging & cottage parking</p>
-                </div>
-              </div>
-
-              <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3 text-xs text-slate-300">
-                <h5 className="font-bold text-white text-sm">Where to Charge While at Sauble Beach:</h5>
-                <ul className="space-y-2 list-disc pl-4 text-slate-300">
-                  <li>
-                    <strong>Beach Parking Public FLO Level 2 Chargers:</strong> Sauble Beach features public Level 2 chargers near the main beach strip. Plug in using the standard J1772 connector and start the session using the <strong>FLO Mobile App</strong> while enjoying the beach.
-                  </li>
-                  <li>
-                    <strong>Standard 120V Cottage Outlet (Trickle Charge):</strong> If staying overnight at a cottage on Fifth Avenue South, you can plug your included Genesis portable trickle charger into any standard 120V household outlet. It adds ~5-7 km of range per hour (adds ~70 km overnight!).
-                  </li>
-                  <li>
-                    <strong>Wiarton / Southampton Backup DC Chargers:</strong> Wiarton (15 mins east) and Southampton (20 mins south) feature 50 kW FLO/Ivy fast chargers if you need a quick boost during day trips.
-                  </li>
-                </ul>
-              </div>
-            </div>
-          )}
-
-          {/* Navigation Controls */}
-          <div className="flex justify-between items-center pt-4 border-t border-slate-800">
-            <button
-              disabled={activeStep === 1}
-              onClick={() => setActiveStep(prev => prev - 1)}
-              className={`flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                activeStep === 1
-                  ? 'opacity-40 text-slate-600 cursor-not-allowed'
-                  : 'bg-slate-800 text-slate-200 hover:bg-slate-700'
-              }`}
-            >
-              <ChevronLeft className="w-4 h-4" /> Previous Phase
-            </button>
-
-            <span className="text-xs text-slate-500">Phase {activeStep} of 4</span>
-
-            <button
-              disabled={activeStep === 4}
-              onClick={() => setActiveStep(prev => prev + 1)}
-              className={`flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                activeStep === 4
-                  ? 'opacity-40 text-slate-600 cursor-not-allowed'
-                  : 'bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md'
-              }`}
-            >
-              Next Phase <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-
-        </section>
-
-        {/* ALL CHARGING LOCATIONS BY CORRIDOR */}
-        <section className="bg-slate-900/80 rounded-3xl border border-slate-800 p-6 space-y-6">
-          <div>
-            <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">Complete Directory</span>
-            <h3 className="text-xl font-bold text-white mt-0.5">All Charging Options: Burlington ➔ Sauble Beach</h3>
-            <p className="text-xs text-slate-400">Select a section of the route below to inspect every charger, plug, and payment method.</p>
-          </div>
-
-          {/* Corridor Selection Pills */}
-          <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-none">
-            {[
-              { id: 'burlington', name: '1. Burlington (Start)' },
-              { id: 'enroute', name: '2. Orangeville / Shelburne' },
-              { id: 'owensound', name: '3. Owen Sound (Gateway)' },
-              { id: 'sauble', name: '4. Sauble Beach (Destination)' }
-            ].map((c) => (
-              <button
-                key={c.id}
-                onClick={() => setSelectedCorridor(c.id)}
-                className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                  selectedCorridor === c.id
-                    ? 'bg-amber-500 text-slate-950 shadow-md'
-                    : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-                }`}
-              >
-                {c.name}
-              </button>
-            ))}
-          </div>
-
-          {/* Corridor Details Card */}
-          <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-4">
-            <div className="border-b border-slate-800 pb-3">
-              <h4 className="text-lg font-bold text-white">{activeCorridor.title}</h4>
-              <p className="text-xs text-amber-400">{activeCorridor.locationDesc}</p>
-              <p className="text-xs text-slate-400 mt-1">{activeCorridor.recommendedStrategy}</p>
-            </div>
-
-            <div className="space-y-4">
-              {activeCorridor.stations.map((st, idx) => (
-                <div key={idx} className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                    <h5 className="font-bold text-white text-sm">{st.provider}</h5>
-                    <span className="text-xs bg-slate-950 text-amber-400 px-2.5 py-1 rounded-lg border border-slate-800 w-fit">
-                      {st.type}
-                    </span>
+                    <p className="text-xs text-slate-400 pt-1">
+                      <strong>How to use:</strong> {st.instructions}
+                    </p>
                   </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
-                  <div className="grid md:grid-cols-3 gap-2 text-xs pt-1">
-                    <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-                      <span className="text-slate-500 block font-semibold">Plug Type</span>
-                      <span className="text-slate-200 font-medium">{st.plug}</span>
-                    </div>
-                    <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-                      <span className="text-slate-500 block font-semibold">Payment Method</span>
-                      <span className="text-emerald-400 font-medium">{st.payment}</span>
-                    </div>
-                    <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-                      <span className="text-slate-500 block font-semibold">Best Used For</span>
-                      <span className="text-amber-300 font-medium">{st.idealFor}</span>
-                    </div>
+        {/* TAB 4: PRE-TRIP CHECKLIST */}
+        {activeTab === 'checklist' && (
+          <section className="bg-slate-900/80 rounded-3xl border border-slate-800 p-6 space-y-4">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-6 h-6 text-amber-400" />
+              <h3 className="text-lg font-bold text-white">Pre-Trip Checklist: Burlington to Sauble Beach</h3>
+            </div>
+            <p className="text-xs text-slate-400">Complete these 4 simple steps before leaving Burlington!</p>
+
+            <div className="grid md:grid-cols-2 gap-3 pt-2">
+              {[
+                { id: 'downloadApps', title: '1. Download FLO & Ivy Apps', desc: 'Download FLO and Ivy Charging apps onto your phone before leaving Burlington.' },
+                { id: 'checkAdapter', title: '2. Pack Tesla NACS Adapter', desc: 'Ensure official Genesis NACS adapter is in your trunk if planning to use Tesla Superchargers.' },
+                { id: 'preconditionNav', title: '3. Program Electrify Canada Owen Sound', desc: 'Set charger in Genesis Nav to pre-warm battery for 235 kW fast charging.' },
+                { id: 'beachChargePlan', title: '4. Sauble Beach Parking Plan', desc: 'Locate FLO Level 2 chargers on Fifth Avenue / Main Street for beach parking.' }
+              ].map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => toggleChecklist(item.id)}
+                  className={`p-4 rounded-2xl border cursor-pointer transition-all flex items-start gap-3 ${
+                    tripChecklist[item.id]
+                      ? 'bg-amber-500/10 border-amber-500/40 text-white'
+                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                  }`}
+                >
+                  <div className={`w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5 border ${
+                    tripChecklist[item.id] ? 'bg-amber-500 border-amber-500 text-slate-950' : 'border-slate-700 bg-slate-900'
+                  }`}>
+                    {tripChecklist[item.id] && <CheckCircle2 className="w-4 h-4" />}
                   </div>
-
-                  <p className="text-xs text-slate-400 pt-1">
-                    <strong>How to use:</strong> {st.instructions}
-                  </p>
+                  <div className="space-y-0.5">
+                    <h4 className="text-xs font-bold text-white">{item.title}</h4>
+                    <p className="text-[11px] text-slate-400">{item.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
-        </section>
-
-        {/* PRE-TRIP PREPARATION CHECKLIST */}
-        <section className="bg-slate-900/80 rounded-3xl border border-slate-800 p-6 space-y-4">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-6 h-6 text-amber-400" />
-            <h3 className="text-lg font-bold text-white">Pre-Trip Checklist: Burlington to Sauble Beach</h3>
-          </div>
-          <p className="text-xs text-slate-400">Complete these 4 simple steps before leaving Burlington!</p>
-
-          <div className="grid md:grid-cols-2 gap-3 pt-2">
-            {[
-              { id: 'downloadApps', title: '1. Download FLO & Ivy Apps', desc: 'Download FLO and Ivy Charging apps onto your phone before leaving Burlington.' },
-              { id: 'checkAdapter', title: '2. Pack Tesla NACS Adapter', desc: 'Ensure official Genesis NACS adapter is in your trunk if planning to use Tesla Superchargers.' },
-              { id: 'preconditionNav', title: '3. Program Electrify Canada Owen Sound', desc: 'Set charger in Genesis Nav to pre-warm battery for 235 kW fast charging.' },
-              { id: 'beachChargePlan', title: '4. Sauble Beach Parking Plan', desc: 'Locate FLO Level 2 chargers on Fifth Avenue / Main Street for beach parking.' }
-            ].map((item) => (
-              <div
-                key={item.id}
-                onClick={() => toggleChecklist(item.id)}
-                className={`p-4 rounded-2xl border cursor-pointer transition-all flex items-start gap-3 ${
-                  tripChecklist[item.id]
-                    ? 'bg-amber-500/10 border-amber-500/40 text-white'
-                    : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
-                }`}
-              >
-                <div className={`w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5 border ${
-                  tripChecklist[item.id] ? 'bg-amber-500 border-amber-500 text-slate-950' : 'border-slate-700 bg-slate-900'
-                }`}>
-                  {tripChecklist[item.id] && <CheckCircle2 className="w-4 h-4" />}
-                </div>
-                <div className="space-y-0.5">
-                  <h4 className="text-xs font-bold text-white">{item.title}</h4>
-                  <p className="text-[11px] text-slate-400">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+          </section>
+        )}
 
       </main>
 
@@ -579,4 +1106,3 @@ export default function App() {
     </div>
   );
 }
-
