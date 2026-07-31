@@ -1,1 +1,670 @@
+import React, { useState } from 'react';
+import { 
+  Zap, 
+  MapPin, 
+  Clock, 
+  CreditCard, 
+  Smartphone, 
+  Info, 
+  ShieldCheck, 
+  Car, 
+  Navigation, 
+  Plug, 
+  ChevronRight, 
+  ChevronLeft,
+  CheckCircle2,
+  AlertTriangle,
+  HelpCircle,
+  ExternalLink,
+  RotateCcw,
+  Sparkles,
+  Layers,
+  Award
+} from 'lucide-react';
+
+export default function App() {
+  // Selected Genesis Model
+  const [selectedModel, setSelectedModel] = useState('gv60');
+
+  // Journey Wizard Step State (1 to 5)
+  const [activeStep, setActiveStep] = useState(1);
+
+  // Selected Provider Filter for Deep Dive Section
+  const [selectedProvider, setSelectedProvider] = useState('ivy');
+
+  // Interactive Checklist State for trip
+  const [tripChecklist, setTripChecklist] = useState({
+    downloadApps: false,
+    checkAdapter: false,
+    preconditionNav: false,
+    tapCreditCard: false
+  });
+
+  // Vehicle Database
+  const models = {
+    gv60: {
+      name: 'Genesis GV60',
+      portType: 'CCS1 (Native)',
+      battery: '77.4 kWh',
+      range: '378 - 473 km',
+      nacsAdapterNeeded: true,
+      note: 'MY2023-2025 models feature a CCS1 port. MY2026+ features native NACS.'
+    },
+    gv70: {
+      name: 'Electrified GV70',
+      portType: 'CCS1 (Native)',
+      battery: '77.4 kWh',
+      range: '383 km',
+      nacsAdapterNeeded: true,
+      note: 'Front grille charge port. Native CCS1 connector.'
+    },
+    g80: {
+      name: 'Electrified G80',
+      portType: 'CCS1 (Native)',
+      battery: '87.2 kWh',
+      range: '454 km',
+      nacsAdapterNeeded: true,
+      note: 'Front grille charge port with electronic door.'
+    }
+  };
+
+  // Provider Database
+  const providers = {
+    ivy: {
+      name: 'Ivy Charging Network (ONroute Plazas)',
+      locations: 'Highway 401 ONroute plazas (e.g. Bowmanville / Newcastle) and Hwy 115',
+      speed: '50 kW - 150 kW DC Fast',
+      plugType: 'CCS1 & CHAdeMO',
+      adapterNeeded: 'NO adapter needed for Genesis CCS1 port.',
+      paymentType: 'Mobile App OR Credit Card Reader at station',
+      appRequired: 'Ivy Charging App or Direct Credit Card Tap',
+      stepByStep: [
+        'Park vehicle close to charger (plug cable reach is short).',
+        'Plug the heavy CCS cable directly into your Genesis charging port until it clicks.',
+        'Tap your RFID card, scan QR code with Ivy App, or tap Credit Card on reader screen.',
+        'Press "Start Charge" on the screen. Listen for a loud "clunk" sound (contactor locking).'
+      ],
+      beginnerTip: 'Great for Hwy 401 stops before turning north on Hwy 115 to Peterborough!'
+    },
+    flo: {
+      name: 'FLO Charging Network',
+      locations: 'Downtown Peterborough, Municipal Lots, Canadian Tire plazas',
+      speed: '50 kW - 100 kW DC & Level 2',
+      plugType: 'CCS1 & J1772',
+      adapterNeeded: 'NO adapter needed for Genesis CCS1 port.',
+      paymentType: 'FLO Mobile App or FLO RFID Card (Most reliable)',
+      appRequired: 'FLO App (Pre-load $10 account balance)',
+      stepByStep: [
+        'Open FLO App on smartphone and tap station number on map.',
+        'Un-holster the heavy plug from charger unit.',
+        'Insert cable plug firmly into your Genesis charge port.',
+        'Tap "Start Session" in the FLO App or tap FLO card against charger icon.'
+      ],
+      beginnerTip: 'FLO is Ontario’s most reliable network. Download the app before leaving home!'
+    },
+    electrify_ca: {
+      name: 'Electrify Canada',
+      locations: 'Major Shopping Centers (e.g. Pickering Town Centre, Belleville, Kingston)',
+      speed: '150 kW - 350 kW Ultra-Fast',
+      plugType: 'CCS1',
+      adapterNeeded: 'NO adapter needed. Plug connects directly.',
+      paymentType: 'Direct Credit Card Reader OR Electrify Canada App',
+      appRequired: 'Credit Card direct tap supported on display',
+      stepByStep: [
+        'Select 350 kW station handle for maximum 800V speed.',
+        'Plug connector into Genesis port firmly.',
+        'Tap Credit Card / Apple Pay directly on station screen payment terminal.',
+        'Screen will display "Initiating Charge". Takes ~18 mins for 10% to 80%!'
+      ],
+      beginnerTip: 'Fastest charger available for Genesis! Charges from 10% to 80% in 18 minutes.'
+    },
+    petro_can: {
+      name: 'Petro-Canada EV Highway',
+      locations: 'Petro-Canada Travel Centers (e.g. Hwy 401 Whitby / Oshawa)',
+      speed: '200 kW - 350 kW Ultra-Fast',
+      plugType: 'CCS1',
+      adapterNeeded: 'NO adapter needed.',
+      paymentType: 'Credit Card Tap / Chip at machine',
+      appRequired: 'No app needed - Works like a standard gas pump screen!',
+      stepByStep: [
+        'Plug CCS cable into car port.',
+        'Tap Credit Card on machine terminal.',
+        'Follow simple on-screen prompt: "Authorizing Card..."',
+        'Press green "START" button on the dispenser.'
+      ],
+      beginnerTip: 'Easiest transition for traditional drivers because payment works just like a gas pump!'
+    },
+    tesla: {
+      name: 'Tesla Supercharger (V3/V4)',
+      locations: 'Peterborough Supercharger plaza & Hwy 401 corridors',
+      speed: '250 kW (Delivers ~100-125 kW to Genesis)',
+      plugType: 'NACS (Tesla style)',
+      adapterNeeded: 'YES! Official NACS-to-CCS Adapter Required (unless MY2026+ native)',
+      paymentType: 'Tesla Mobile App ONLY',
+      appRequired: 'Tesla App with credit card saved on profile',
+      stepByStep: [
+        'Attach NACS-to-CCS Adapter onto the Tesla handle until locked.',
+        'Plug combined adapter + handle into your Genesis port.',
+        'Open Tesla App -> tap "Charge Non-Tesla" -> select stall number (e.g., 2A).',
+        'Tap "Start Charging" inside Tesla App.'
+      ],
+      beginnerTip: 'Requires official Genesis NACS adapter. Charging speed is capped at ~100 kW due to 400V->800V boost converter.'
+    }
+  };
+
+  const currentModel = models[selectedModel];
+  const activeProv = providers[selectedProvider];
+
+  const toggleChecklist = (key) => {
+    setTripChecklist(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans pb-16 selection:bg-amber-500 selection:text-slate-950">
+      
+      {/* HEADER */}
+      <header className="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-amber-500 rounded-xl text-slate-950 shadow-lg shadow-amber-500/20">
+              <Zap className="w-6 h-6 fill-current" />
+            </div>
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-amber-400">First-Time EV Road Trip Guide</span>
+              <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+                Genesis EV Trip to Peterborough, ON
+              </h1>
+            </div>
+          </div>
+
+          {/* Model Switcher */}
+          <div className="flex items-center gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+            <span className="text-xs text-slate-400 pl-2 hidden sm:inline">Your Car:</span>
+            {Object.keys(models).map((key) => (
+              <button
+                key={key}
+                onClick={() => setSelectedModel(key)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  selectedModel === key
+                    ? 'bg-amber-500 text-slate-950 shadow-md'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                {models[key].name}
+              </button>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      {/* MAIN CONTAINER */}
+      <main className="max-w-5xl mx-auto px-4 pt-6 space-y-8">
+
+        {/* TRIP STORY HERO BANNER */}
+        <section className="bg-gradient-to-r from-slate-900 via-slate-900 to-amber-950/40 p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5" /> Route: GTA / Oshawa ➔ Hwy 115 ➔ Peterborough (~135 km)
+            </span>
+            <span className="text-xs text-slate-400">Estimated Drive Time: 1 hr 25 mins</span>
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-2xl font-extrabold text-white">
+              First Time Driving an EV on Highway 115? Don't Panic!
+            </h2>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              Taking your <strong className="text-amber-400">{currentModel.name}</strong> on its first out-of-town road trip to Peterborough is simple once you know three basic things: <strong>Plug Type</strong>, <strong>Payment Method</strong>, and <strong>Station Speed</strong>.
+            </p>
+          </div>
+
+          {/* Quick Vehicle Specs Callout */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2 text-xs">
+            <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+              <span className="text-slate-400 block">Full Charge Range</span>
+              <span className="text-white font-bold text-sm">{currentModel.range}</span>
+            </div>
+            <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+              <span className="text-slate-400 block">Genesis Native Port</span>
+              <span className="text-amber-400 font-bold text-sm">{currentModel.portType}</span>
+            </div>
+            <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+              <span className="text-slate-400 block">Trip Battery Consumption</span>
+              <span className="text-emerald-400 font-bold text-sm">~35% to 45% used</span>
+            </div>
+            <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+              <span className="text-slate-400 block">Charging Needed?</span>
+              <span className="text-white font-bold text-sm">Optional 10-min top-up</span>
+            </div>
+          </div>
+        </section>
+
+        {/* STEP BY STEP INTERACTIVE ROAD TRIP WIZARD */}
+        <section className="bg-slate-900/80 rounded-3xl border border-slate-800 p-6 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+            <div>
+              <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">Interactive Tutorial</span>
+              <h3 className="text-lg font-bold text-white">4-Step Masterclass to Public Charging</h3>
+            </div>
+
+            {/* Step Selector Buttons */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-2 sm:pb-0 scrollbar-none">
+              {[1, 2, 3, 4].map((stepNum) => (
+                <button
+                  key={stepNum}
+                  onClick={() => setActiveStep(stepNum)}
+                  className={`w-9 h-9 rounded-xl font-bold text-xs flex items-center justify-center transition-all ${
+                    activeStep === stepNum
+                      ? 'bg-amber-500 text-slate-950 shadow-md scale-105'
+                      : activeStep > stepNum
+                      ? 'bg-slate-800 text-emerald-400 border border-emerald-500/30'
+                      : 'bg-slate-950 text-slate-500 border border-slate-800'
+                  }`}
+                >
+                  {activeStep > stepNum ? <CheckCircle2 className="w-5 h-5" /> : `Step ${stepNum}`}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* STEP 1: CABLES & ADAPTERS */}
+          {activeStep === 1 && (
+            <div className="space-y-5 animate-fadeIn">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-400 border border-amber-500/20">
+                  <Plug className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-base font-bold text-white">Step 1: Do You Need an Adapter?</h4>
+                  <p className="text-xs text-slate-400">Understanding plugs for your {currentModel.name}</p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                
+                {/* CCS1 Plug Info */}
+                <div className="bg-slate-950 p-5 rounded-2xl border border-amber-500/30 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <span className="text-xs bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full font-bold border border-emerald-500/20">
+                      Standard Plug (No Adapter)
+                    </span>
+                    <span className="text-xs font-mono text-slate-400">CCS1 / J1772</span>
+                  </div>
+                  <h5 className="font-bold text-white text-sm">CCS1 Fast Chargers (90% of Ontario Public Stations)</h5>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Stations like <strong>Ivy (ONroute), Electrify Canada, FLO, and Petro-Canada</strong> use the CCS1 connector. 
+                    This plugs <u>directly</u> into your Genesis charging port. No extra equipment required!
+                  </p>
+                </div>
+
+                {/* Tesla NACS Adapter Info */}
+                <div className="bg-slate-950 p-5 rounded-2xl border border-blue-500/30 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <span className="text-xs bg-blue-500/10 text-blue-400 px-2.5 py-1 rounded-full font-bold border border-blue-500/20">
+                      Adapter Required
+                    </span>
+                    <span className="text-xs font-mono text-slate-400">Tesla NACS</span>
+                  </div>
+                  <h5 className="font-bold text-white text-sm">Tesla Superchargers in Peterborough</h5>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    To use a Tesla Supercharger stall, you must attach your official <strong>Genesis NACS-to-CCS Adapter</strong> onto the Tesla handle before plugging into your car.
+                  </p>
+                </div>
+
+              </div>
+
+              <div className="bg-slate-950/60 p-4 rounded-2xl border border-slate-800 text-xs text-slate-300 flex items-start gap-3">
+                <Info className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <strong>Rule of Thumb for Beginners:</strong> When driving along Highway 401 or Highway 115 to Peterborough, pull up to an <strong>Ivy (ONroute)</strong> or <strong>Electrify Canada</strong> station. Just grab the heavy cable from the station machine and plug it directly into your car!
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 2: PAYMENT METHODS */}
+          {activeStep === 2 && (
+            <div className="space-y-5 animate-fadeIn">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-400 border border-emerald-500/20">
+                  <CreditCard className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-base font-bold text-white">Step 2: How Do You Pay for Electricity?</h4>
+                  <p className="text-xs text-slate-400">Credit card readers vs mobile phone apps</p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                
+                {/* Direct Credit Card */}
+                <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3">
+                  <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase">
+                    <CreditCard className="w-4 h-4" /> Option A: Tap Credit Card
+                  </div>
+                  <h5 className="font-bold text-white text-sm">Electrify Canada & Petro-Canada</h5>
+                  <p className="text-xs text-slate-300">
+                    Works just like a gas pump! Plug in the car cable, then tap your Visa, Mastercard, or Apple Pay on the station screen card reader.
+                  </p>
+                  <span className="inline-block text-[11px] bg-slate-900 text-slate-400 px-2.5 py-1 rounded-lg border border-slate-800">
+                    Difficulty: 🟢 Extremely Easy (No App)
+                  </span>
+                </div>
+
+                {/* Mobile App Required */}
+                <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3">
+                  <div className="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase">
+                    <Smartphone className="w-4 h-4" /> Option B: Phone App
+                  </div>
+                  <h5 className="font-bold text-white text-sm">FLO Network, Ivy & Tesla</h5>
+                  <p className="text-xs text-slate-300">
+                    These networks require downloading their mobile app onto your smartphone beforehand. You create an account, add $10-20 balance, and initiate charging via map scan.
+                  </p>
+                  <span className="inline-block text-[11px] bg-slate-900 text-slate-400 px-2.5 py-1 rounded-lg border border-slate-800">
+                    Difficulty: 🟡 Easy (Download before trip)
+                  </span>
+                </div>
+
+              </div>
+
+              {/* Pre-trip Preparation Advice */}
+              <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-xs space-y-2 text-amber-200">
+                <span className="font-bold flex items-center gap-1.5 text-amber-400">
+                  <Sparkles className="w-4 h-4" /> Golden Tip Before Leaving Toronto / GTA:
+                </span>
+                <p>
+                  Cell phone service can occasionally drop in rural highway pockets. <strong>Download the FLO App and Ivy Charging App on your phone while still at home</strong> and add a credit card to your account profile!
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3: CHARGER SPEEDS */}
+          {activeStep === 3 && (
+            <div className="space-y-5 animate-fadeIn">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-400 border border-blue-500/20">
+                  <Clock className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-base font-bold text-white">Step 3: Charger Speeds & Rest Stop Etiquette</h4>
+                  <p className="text-xs text-slate-400">Level 2 vs 50 kW vs 350 kW Ultra-Fast</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                
+                <div className="bg-slate-950 p-4 rounded-2xl border border-amber-500/30 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs bg-amber-500 text-slate-950 font-bold px-2 py-0.5 rounded">HIGHWAY BEST</span>
+                      <h5 className="font-bold text-white text-sm">350 kW DC Ultra-Fast Charger</h5>
+                    </div>
+                    <p className="text-xs text-slate-300">Electrify Canada / Petro-Can</p>
+                  </div>
+                  <div className="text-left md:text-right">
+                    <span className="text-xl font-bold text-emerald-400 block">18 Mins</span>
+                    <span className="text-[11px] text-slate-400">Charges 10% to 80% (Enough time for coffee)</span>
+                  </div>
+                </div>
+
+                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs bg-slate-800 text-slate-300 font-bold px-2 py-0.5 rounded">STANDARD FAST</span>
+                      <h5 className="font-bold text-white text-sm">50 kW - 150 kW DC Charger</h5>
+                    </div>
+                    <p className="text-xs text-slate-300">Ivy ONroute Plazas / FLO DC</p>
+                  </div>
+                  <div className="text-left md:text-right">
+                    <span className="text-xl font-bold text-amber-400 block">25 - 35 Mins</span>
+                    <span className="text-[11px] text-slate-400">Perfect while eating lunch at ONroute</span>
+                  </div>
+                </div>
+
+                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs bg-slate-800 text-slate-400 font-bold px-2 py-0.5 rounded">DESTINATION</span>
+                      <h5 className="font-bold text-white text-sm">Level 2 AC Charger (11 kW)</h5>
+                    </div>
+                    <p className="text-xs text-slate-300">Hotel / Downtown Peterborough Street Parking</p>
+                  </div>
+                  <div className="text-left md:text-right">
+                    <span className="text-xl font-bold text-slate-400 block">4 - 7 Hours</span>
+                    <span className="text-[11px] text-slate-400">Plug in while sleeping overnight or spending the day</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+          {/* STEP 4: REAL SIMULATION TO PETERBOROUGH */}
+          {activeStep === 4 && (
+            <div className="space-y-5 animate-fadeIn">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-400 border border-amber-500/20">
+                  <Navigation className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-base font-bold text-white">Step 4: Your Step-by-Step Peterborough Drive</h4>
+                  <p className="text-xs text-slate-400">Simulating the actual stop on your trip</p>
+                </div>
+              </div>
+
+              {/* Timeline Sequence */}
+              <div className="space-y-4 relative before:absolute before:inset-0 before:left-3.5 before:w-0.5 before:bg-slate-800">
+                
+                <div className="relative pl-9 space-y-1">
+                  <div className="absolute left-1.5 top-1.5 w-4 h-4 rounded-full bg-amber-500 border-4 border-slate-900" />
+                  <span className="text-xs font-bold text-amber-400">DEPARTURE: Greater Toronto Area (100% Battery)</span>
+                  <p className="text-xs text-slate-300">
+                    Set destination to "Peterborough, ON" in your <strong>Genesis In-Car Navigation</strong>. If stopping at a fast charger, set the charger as destination so the battery warm-up preconditioning activates automatically.
+                  </p>
+                </div>
+
+                <div className="relative pl-9 space-y-1">
+                  <div className="absolute left-1.5 top-1.5 w-4 h-4 rounded-full bg-emerald-500 border-4 border-slate-900" />
+                  <span className="text-xs font-bold text-emerald-400">MID-WAY STOP: Bowmanville ONroute (Hwy 401) or Hwy 115</span>
+                  <p className="text-xs text-slate-300">
+                    Your battery is around 65%. Pull into the Ivy Fast Charging stalls at the ONroute plaza.
+                  </p>
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs space-y-1 text-slate-400 mt-2">
+                    <p className="text-white font-medium">What to do at the charger handle:</p>
+                    <ol className="list-decimal pl-4 space-y-1">
+                      <li>Turn off car engine & press fuel flap button to open charging door.</li>
+                      <li>Unplug Ivy CCS cable and press firmly into car charging port until it clicks.</li>
+                      <li>Tap credit card on Ivy station reader or scan QR code with Ivy App.</li>
+                      <li>Walk inside for coffee! 12 minutes later, you will be back to 85%+.</li>
+                    </ol>
+                  </div>
+                </div>
+
+                <div className="relative pl-9 space-y-1">
+                  <div className="absolute left-1.5 top-1.5 w-4 h-4 rounded-full bg-blue-500 border-4 border-slate-900" />
+                  <span className="text-xs font-bold text-blue-400">ARRIVAL: Downtown Peterborough (60% Battery)</span>
+                  <p className="text-xs text-slate-300">
+                    You arrive safely in Peterborough with plenty of battery remaining. You can plug into a downtown FLO Level 2 charger while grabbing dinner or visiting the Trent Severn Waterway locks.
+                  </p>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+          {/* Wizard Navigation Bar */}
+          <div className="flex justify-between items-center pt-4 border-t border-slate-800">
+            <button
+              disabled={activeStep === 1}
+              onClick={() => setActiveStep(prev => prev - 1)}
+              className={`flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                activeStep === 1
+                  ? 'opacity-40 text-slate-600 cursor-not-allowed'
+                  : 'bg-slate-800 text-slate-200 hover:bg-slate-700'
+              }`}
+            >
+              <ChevronLeft className="w-4 h-4" /> Back
+            </button>
+
+            <span className="text-xs text-slate-500">Step {activeStep} of 4</span>
+
+            <button
+              disabled={activeStep === 4}
+              onClick={() => setActiveStep(prev => prev + 1)}
+              className={`flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                activeStep === 4
+                  ? 'opacity-40 text-slate-600 cursor-not-allowed'
+                  : 'bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md'
+              }`}
+            >
+              Next Step <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+
+        </section>
+
+        {/* PROVIDER DEEP DIVE LOOKUP TOOL */}
+        <section className="bg-slate-900/80 rounded-3xl border border-slate-800 p-6 space-y-6">
+          <div>
+            <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">Ontario Network Directory</span>
+            <h3 className="text-xl font-bold text-white mt-0.5">Explore Specific Station Providers in Ontario</h3>
+            <p className="text-xs text-slate-400">Tap a network below to view exact cable, adapter, and payment instructions.</p>
+          </div>
+
+          {/* Provider Tabs */}
+          <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-none">
+            {[
+              { id: 'ivy', name: 'Ivy (ONroute)' },
+              { id: 'flo', name: 'FLO Network' },
+              { id: 'electrify_ca', name: 'Electrify Canada' },
+              { id: 'petro_can', name: 'Petro-Canada EV' },
+              { id: 'tesla', name: 'Tesla Supercharger' }
+            ].map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setSelectedProvider(p.id)}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                  selectedProvider === p.id
+                    ? 'bg-amber-500 text-slate-950 shadow-md'
+                    : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                }`}
+              >
+                {p.name}
+              </button>
+            ))}
+          </div>
+
+          {/* Provider Detail Display */}
+          <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-800 pb-4">
+              <div>
+                <h4 className="text-lg font-bold text-white">{activeProv.name}</h4>
+                <p className="text-xs text-slate-400">{activeProv.locations}</p>
+              </div>
+              <span className="px-3 py-1 bg-slate-900 text-amber-400 border border-amber-500/30 rounded-full text-xs font-bold w-fit">
+                {activeProv.speed}
+              </span>
+            </div>
+
+            {/* Quick Tech Spec Grid */}
+            <div className="grid md:grid-cols-3 gap-3 text-xs">
+              <div className="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-1">
+                <span className="text-slate-500 block font-semibold">Cable & Plug Type</span>
+                <span className="text-white font-bold">{activeProv.plugType}</span>
+              </div>
+              <div className="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-1">
+                <span className="text-slate-500 block font-semibold">Adapter Needed for Genesis?</span>
+                <span className={selectedProvider === 'tesla' ? 'text-blue-400 font-bold' : 'text-emerald-400 font-bold'}>
+                  {activeProv.adapterNeeded}
+                </span>
+              </div>
+              <div className="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-1">
+                <span className="text-slate-500 block font-semibold">Payment Method</span>
+                <span className="text-amber-400 font-bold">{activeProv.paymentType}</span>
+              </div>
+            </div>
+
+            {/* Step-by-Step Instructions */}
+            <div className="space-y-3">
+              <h5 className="text-xs font-bold text-white uppercase tracking-wider">How to plug in & pay at this station:</h5>
+              <div className="space-y-2">
+                {activeProv.stepByStep.map((stepText, idx) => (
+                  <div key={idx} className="flex items-start gap-3 bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 text-xs">
+                    <span className="w-5 h-5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold flex items-center justify-center flex-shrink-0 text-[11px]">
+                      {idx + 1}
+                    </span>
+                    <span className="text-slate-200 mt-0.5">{stepText}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Beginner Tip */}
+            <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-300 flex items-start gap-2">
+              <Award className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <strong>Pro Driver Tip:</strong> {activeProv.beginnerTip}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* PRE-TRIP CHECKLIST FOR PETERBOROUGH */}
+        <section className="bg-slate-900/80 rounded-3xl border border-slate-800 p-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-6 h-6 text-amber-400" />
+            <h3 className="text-lg font-bold text-white">Your Pre-Trip Peterborough Checklist</h3>
+          </div>
+          <p className="text-xs text-slate-400">Tick off these 4 simple items before putting your Genesis in drive!</p>
+
+          <div className="grid md:grid-cols-2 gap-3 pt-2">
+            {[
+              { id: 'downloadApps', title: '1. Download Apps', desc: 'Download FLO and Ivy apps onto your iPhone or Android.' },
+              { id: 'checkAdapter', title: '2. Check Glovebox / Trunk', desc: 'Ensure your official NACS adapter is packed if planning to use Tesla stalls.' },
+              { id: 'preconditionNav', title: '3. Use Genesis Navigation', desc: 'Set charger as destination so battery warms up for fast charging.' },
+              { id: 'tapCreditCard', title: '4. Keep Credit Card Handy', desc: 'Electrify Canada and Petro-Can allow direct card tapping.' }
+            ].map((item) => (
+              <div
+                key={item.id}
+                onClick={() => toggleChecklist(item.id)}
+                className={`p-4 rounded-2xl border cursor-pointer transition-all flex items-start gap-3 ${
+                  tripChecklist[item.id]
+                    ? 'bg-amber-500/10 border-amber-500/40 text-white'
+                    : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                }`}
+              >
+                <div className={`w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5 border ${
+                  tripChecklist[item.id] ? 'bg-amber-500 border-amber-500 text-slate-950' : 'border-slate-700 bg-slate-900'
+                }`}>
+                  {tripChecklist[item.id] && <CheckCircle2 className="w-4 h-4" />}
+                </div>
+                <div className="space-y-0.5">
+                  <h4 className="text-xs font-bold text-white">{item.title}</h4>
+                  <p className="text-[11px] text-slate-400">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+      </main>
+
+      {/* FOOTER */}
+      <footer className="max-w-5xl mx-auto px-4 mt-12 pt-6 border-t border-slate-800 text-center text-xs text-slate-500 flex flex-col md:flex-row justify-between items-center gap-4">
+        <p>© Genesis First-Time EV Public Charging Guide (Ontario - Peterborough Edition).</p>
+        <div className="flex gap-4">
+          <a href="https://www.genesis.com/ca/en" target="_blank" rel="noreferrer" className="hover:text-amber-400 flex items-center gap-1">
+            Genesis Owners Portal <ExternalLink className="w-3 h-3" />
+          </a>
+          <a href="https://www.plugshare.com" target="_blank" rel="noreferrer" className="hover:text-amber-400 flex items-center gap-1">
+            PlugShare Ontario <ExternalLink className="w-3 h-3" />
+          </a>
+        </div>
+      </footer>
+
+    </div>
+  );
+}
+
 
